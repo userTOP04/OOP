@@ -22,50 +22,64 @@ class App:
         self.question_index = 0
         self.true_answers = 0
         self.false_answers = 0
-        self.start()
+        self.start(False)
         self.window.mainloop()
-
-
 
     def show_question(self) -> None:
         question = questions[self.question_index]
-        tkinter.Label(self.main_frame, text=question['вопрос']).pack() 
+        tkinter.Label(self.main_frame, text=question['вопрос']).pack()
+        button_frame = tkinter.Frame(self.main_frame)
+        button_frame.pack()
         for answer in question['ответы']:
-            tkinter.Button(self.main_frame, text=answer, command=lambda: self.on_click(answer)).pack()
+            tkinter.Button(button_frame,
+                           text=answer, 
+                           command=lambda arg=answer: self.on_click(arg)
+                           ).pack(side='left')
 
     def on_click(self, button_text):
         question = questions[self.question_index]
-        if button_text == question['индекс правильного ответа']:
+        if button_text == question['ответ']:
             self.true_answers += 1
         else:
             self.false_answers += 1
 
-        for widget in self.main_frame.winfo_children():
-            widget.destroy()
+        self.clear()
 
         self.question_index += 1
         if self.question_index < len(questions):           
            self.show_question()
         else:
-            pass
+            self.show_result()
 
-    def show_statistics(self) -> None:
-        self.questions_frame.pack_forget()
-        self.results_frame = tkinter.Frame(self.window)
-        self.results_frame.pack(expand=True)
-        tkinter.Label(self.results_frame, text='Вопросы викторины закончились').pack()
-        tkinter.Label(self.results_frame, text=f'Всего вопросов: {len(questions)}').pack()
-        tkinter.Label(self.results_frame, text=f'Правильных ответов: {self.true_answers}').pack()
-        tkinter.Label(self.results_frame, text=f'Неверных ответов: {self.false_answers}').pack()
-        tkinter.Button(self.results_frame, text='Начать заново', command=self.start).pack()
+    def clear(self) -> None:
+        for widget in self.main_frame.winfo_children():
+            widget.destroy() 
 
-    def start(self) -> None:
+    def show_result(self) -> None:
+        tkinter.Label(self.main_frame, text='Вопросы викторины закончились').pack()
+        tkinter.Label(self.main_frame, 
+                      text=f'Всего вопросов: {len(questions)}'
+                      ).pack()
+        tkinter.Label(self.main_frame, 
+                      text=f'Правильных ответов: {self.true_answers}'
+                      ).pack()
+        tkinter.Label(self.main_frame, 
+                      text=f'Неверных ответов: {self.false_answers}'
+                      ).pack()
+        tkinter.Button(self.main_frame, 
+                       text='Начать заново', 
+                       command=lambda: self.start(True)
+                       ).pack()
+
+    def start(self, start_over: bool) -> None:
         self.question_index = 0
         self.true_answers = 0
         self.false_answers = 0
         if self.shuffle_questions:
             random.shuffle(questions)
+        if start_over:
+            self.clear()
         self.show_question()
-
-
+        
+        
 App()
