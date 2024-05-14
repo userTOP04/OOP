@@ -70,8 +70,14 @@ class App:
     def show_result(self) -> None:
         self.time_finish = time.time()
         time_total = self.time_finish - self.time_starter
+        time_total = int(time_total)
+
+        hours = time_total // (60 * 60)
+        minutes = time_total // 60 % 60
+        seconds = time_total % 60
+
         tkinter.Label(
-            self.main_frame, text=f'Время: {round(time_total, 1)}'
+            self.main_frame, text=f'Время: {hours:02}:{minutes:02}:{seconds:02}'
         ).pack()
         tkinter.Label(
             self.main_frame, 
