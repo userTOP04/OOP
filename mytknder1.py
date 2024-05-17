@@ -1,7 +1,10 @@
 import tkinter
 import random
 import time 
+import os
+from PIL import Image, ImageTk
 from questions import questions
+
 
 
 class App:
@@ -19,6 +22,7 @@ class App:
         self.shuffle_questions = shuffle_questions
         self.main_frame = tkinter.Frame(self.window)
         self.main_frame.place(relx=0.5, rely=0.5, anchor='center')
+        self.photo_image = None
         self.results_frame = None
         self.questions_frame = None
         self.time_starter = None
@@ -33,10 +37,20 @@ class App:
         question = questions[self.question_index]
         if self.shuffle_answers:
             random.shuffle(question['ответы'])
-        tkinter.Label(
+        question_text = tkinter.Label(
             self.main_frame, 
             text=f'{self.question_index + 1}/{len(question) + 1}'
-        ).pack()
+        )
+        question_text.pack()
+
+
+
+        image_fale_name = question.get('изобрабражение')
+
+        if image_fale_name:
+            image_label = tkinter.Label(self.main_frame)
+            image_label.pack()
+
         tkinter.Label(self.main_frame, text=question['вопрос']).pack(pady=10)
         button_frame = tkinter.Frame(self.main_frame)
         button_frame.pack()
@@ -47,6 +61,27 @@ class App:
                 text=answer, 
                 command=lambda arg=answer: self.on_click(arg)
             ).pack(side='left', padx=20, ipadx=30)
+
+        if image_fale_name:
+            image_label_widht = self.window.winfo_screenheight - self.get_total_hight()
+            file_path = os.path.dirname(__file__)
+            image_path = os.path.join(file_path, 'img', image_fale_name)
+            image = Image.open(image_path)
+            aspect_ratio = image.width / image.height
+            image_widht = int(image_label_widht * aspect_ratio)
+            image = image.resize((image_widht, image_label_widht), Image.LANCZOS)
+            self.photo_image = ImageTk.PhotoImage(image)
+            image_label['image'] = self.photo_image
+            
+
+
+    def get_total_hight(self) -> int:
+        total_hight = 0
+        widgets = self.main_frame.winfo_children()
+        for widget in widgets:
+            widget.update()
+            total_hight += widget.winfo_height()
+        return total_hight + 200
 
     def on_click(self, button_text):
         question = questions[self.question_index]
