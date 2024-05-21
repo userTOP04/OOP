@@ -1,10 +1,9 @@
 import tkinter
 import random
 import time 
-import os
+from pathlib import Path
 from PIL import Image, ImageTk
 from questions import questions
-
 
 
 class App:
@@ -22,6 +21,7 @@ class App:
         self.shuffle_questions = shuffle_questions
         self.main_frame = tkinter.Frame(self.window)
         self.main_frame.place(relx=0.5, rely=0.5, anchor='center')
+        self.image_dir = Path(__file__).parent / 'img'
         self.photo_image = None
         self.results_frame = None
         self.questions_frame = None
@@ -39,11 +39,9 @@ class App:
             random.shuffle(question['ответы'])
         question_text = tkinter.Label(
             self.main_frame, 
-            text=f'{self.question_index + 1}/{len(question) + 1}'
+            text=f'{self.question_index + 1}/{len(questions)}'
         )
         question_text.pack()
-
-
 
         image_fale_name = question.get('изобрабражение')
 
@@ -63,10 +61,8 @@ class App:
             ).pack(side='left', padx=20, ipadx=30)
 
         if image_fale_name:
-            image_label_widht = self.window.winfo_screenheight - self.get_total_hight()
-            file_path = os.path.dirname(__file__)
-            image_path = os.path.join(file_path, 'img', image_fale_name)
-            image = Image.open(image_path)
+            image_label_widht = self.window.winfo_screenheight() - self.get_total_hight()
+            image = Image.open(self.image_dir / image_fale_name)
             aspect_ratio = image.width / image.height
             image_widht = int(image_label_widht * aspect_ratio)
             image = image.resize((image_widht, image_label_widht), Image.LANCZOS)
